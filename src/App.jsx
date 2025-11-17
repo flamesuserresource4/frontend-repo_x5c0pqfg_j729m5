@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 import Header from './components/Header'
 import TeamSearch from './components/TeamSearch'
 import Analysis from './components/Analysis'
-
-const backend = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
+import { apiGet } from './lib/backend'
 
 function App() {
   const [home, setHome] = useState(null)
@@ -18,10 +17,7 @@ function App() {
     setError('')
     setData(null)
     try {
-      const url = `${backend}/api/analyze?home_id=${encodeURIComponent(home.id)}&away_id=${encodeURIComponent(away.id)}`
-      const res = await fetch(url)
-      if (!res.ok) throw new Error(`Analyze failed (${res.status})`)
-      const payload = await res.json()
+      const payload = await apiGet(`/api/analyze?home_id=${encodeURIComponent(home.id)}&away_id=${encodeURIComponent(away.id)}`)
       setData(payload)
     } catch (e) {
       setError(e.message)

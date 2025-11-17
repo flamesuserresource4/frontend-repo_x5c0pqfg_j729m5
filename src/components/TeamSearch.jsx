@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
-
-const backend = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
+import { apiGet } from '../lib/backend'
 
 function TeamSearch({ label, onSelect }) {
   const [q, setQ] = useState('')
@@ -18,12 +17,14 @@ function TeamSearch({ label, onSelect }) {
     }
     setLoading(true)
     try {
-      const res = await fetch(`${backend}/api/search/teams?q=${encodeURIComponent(query)}`)
-      if (!res.ok) throw new Error('Search failed')
-      const data = await res.json()
+      const data = await apiGet(`/api/search/teams?q=${encodeURIComponent(query)}`)
       setResults(data)
+      if (!Array.isArray(data) || data.length === 0) {
+        setError('No teams found. Try a different name (e.g., "Barcelona", "Arsenal").')
+      }
     } catch (e) {
-      setError(e.message)
+      setError(e.message || 'Search failed')
+      setResults([])
     } finally {
       setLoading(false)
     }
